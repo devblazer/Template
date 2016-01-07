@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Template</title>
+	<link rel="stylesheet" type="text/css" href="tooltipster/css/tooltipster.css" />
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="require.js"></script>
+	<script type="text/javascript" src="tooltipster/js/jquery.tooltipster.min.js"></script>
+	<style>
+		#template_editor table {
+			border:0;
+			position:absolute;
+			border-spacing: 0;
+			padding:0;
+		}
+		#adaptor_menu table {
+			border:0;
+			border-spacing: 0;
+			padding:0;
+		}
+		#template_editor td, #adaptor_menu td {
+			font-weight: 700;
+			word-wrap:break-word;
+			padding:0;
+			border:0;
+			text-align: center;
+			vertical-align: middle;
+			font-size:10px;
+		}
+		#adaptor_menu {
+			border:#888 1px solid;
+			border-width: 1px 1px 0 1px;
+		}
+		#adaptor_menu dl {
+			padding:0;
+			margin:0;
+		}
+		#adaptor_menu dt {
+			padding:5px;
+			cursor:pointer;
+			text-align:center;
+			border-bottom:#888 1px solid;
+		}
+		#adaptor_menu dd {
+			display:none;
+			margin:0;
+			padding:0;
+			border-bottom:#888 1px solid;
+			background-color:#eee;
+		}
+		#adaptor_menu dd.open {
+			display:block;
+		}
+		#adaptor_menu dd dd {
+			background-color:#ddd;
+		}
+		#adaptor_menu ul {
+			margin:0;
+			padding:5px 0 0 5px;
+			overflow:hidden;
+		}
+		#adaptor_menu li {
+			display:block;
+			float:left;
+			margin:0 5px 5px 0;
+		}
+
+		.buttons > * {
+			display:inline-block;
+			margin:5px;
+			padding:5px 10px;
+			background-color:#ddd;
+			cursor:pointer;
+		}
+		.buttons > .selected {
+			background-color: #eee;
+		}
+	</style>
+</head>
+<body>
+<div id="adaptor_menu" style="position:absolute;right:0;top:0;width:340px">
+</div>
+<div class="buttons">
+	<a class="rotate">Rotate</a>
+	<a class="flip">Flip</a>
+	<a class="move-to">Move Mode</a>
+	<a class="next-step">Next Step</a>
+	<a class="remove">Remove</a>
+</div>
+<div id="template_editor" style="position:relative">
+</div>
+<script>
+	$(document).ready(function() {
+		$('#adaptor_menu').on('click','dt',function() {
+			var dd = $(this).next();
+			if (dd.hasClass('open')) {
+				dd.removeClass('open');
+			}
+			else {
+				$('#adaptor_menu dd').removeClass('open');
+
+				while (dd.length) {
+					dd.addClass('open');
+					dd = dd.parent().closest('dd');
+				}
+			}
+		});
+
+		requirejs(['Template', 'Player', 'Builder', 'AdaptorPowerCore', 'AdaptorEnemyProximity'],function(Template, Player, Builder, AdaptorPowerCore, AdaptorEnemyProximity) {
+
+			var adaptorTypes = {
+				powerGeneration:{
+					title:'Power generation',
+					children:{
+						powerCore:AdaptorPowerCore
+					}
+				},
+				powerGeneration:{
+					title:'Power generation',
+					children:{
+						powerCore:AdaptorPowerCore
+					}
+				}
+			};
+
+			var builder = new Builder('Workshop', '#template_editor','#adaptor_menu');
+			var player = new Player();
+			var template = new Template(player,19,10000);
+			builder.setTemplate(template);
+
+			builder.registerAdaptor(new AdaptorPowerCore());
+			builder.registerAdaptor(new AdaptorPowerCore());
+			builder.registerAdaptor(new AdaptorPowerCore());
+			builder.registerAdaptor(new AdaptorPowerCore());
+			builder.registerAdaptor(new AdaptorPowerCore());
+			builder.registerAdaptor(new AdaptorEnemyProximity());
+			//enemyProximity.influencers.getClosestEnemy.value = {distance:10};
+
+			builder.render();
+			builder.renderAdaptorList();
+
+			$('.next-step').on('click',function() {
+				builder.step();
+			});
+			$('.rotate').on('click',function() {
+				builder.rotateSelectedAdaptor();
+			});
+			$('.flip').on('click',function() {
+				builder.flipSelectedAdaptor();
+			});
+			$('.remove').on('click',function() {
+				builder.removeSelectedAdaptor();
+			});
+			$('.move-to').on('click',function() {
+				if ($(this).hasClass('selected')) {
+					$(this).removeClass('selected');
+					builder.moveModeOff();
+				}
+				else {
+					$(this).addClass('selected');
+					builder.moveModeOn();
+				}
+			});
+		});
+	});
+</script>
+</body>
+</html>

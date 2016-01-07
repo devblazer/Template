@@ -1,0 +1,7 @@
+nbproject
+project-files
+*_notes
+*.idea
+*.svn
+*.DS_Store
+CHANGE_LIST.TXT
